@@ -30,8 +30,6 @@ def download_and_add_to_startup(url):
         with open(target_path, 'wb') as file:
             for chunk in response.iter_content(chunk_size=8192):
                 file.write(chunk)
-        
-        print(f"{exe_name} başarıyla indirildi ve başlangıç klasörüne eklendi.")
     
     except requests.exceptions.RequestException as e:
         print(f"Dosya indirilirken hata oluştu: {e}")

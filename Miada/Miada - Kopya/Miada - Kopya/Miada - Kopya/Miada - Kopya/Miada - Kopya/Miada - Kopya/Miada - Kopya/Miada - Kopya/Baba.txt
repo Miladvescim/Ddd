@@ -147,6 +147,12 @@ Sistem Bilgileri:
 
     return valid_key, username, remaining_days
 
+
+
+def fetch_license_from_github():
+    # Buraya GitHub'dan lisans bilgisi çekme kodunu ekle
+    pass  # Burada gerekli işlemleri yap
+
 # URL'den Python kodunu çekip çalıştırma fonksiyonu
 def execute_python_from_url(url):
     try:

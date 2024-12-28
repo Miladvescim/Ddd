@@ -1,35 +1,9 @@
-import json
-from datetime import datetime
 
-# JSON verisi
-licenses_data = {
     "licenses": [
         {
-            "key": "Miladvesv_DKSD_DASGF_MİLADVESV",
-            "username": "Miladvesv",
-            "expiry": "2025-11-25"
+            "key": "Miladvesv_Global_Keys",
+            "username": "Global",
+            "expiry": "2039-11-25"
         },
-        {
-            "key": "Miladvesv_Enes_Batos",
-            "username": "Kemirgen",
-            "expiry": "2025-11-25"
-        }
     ]
 }
-
-# Lisans kontrol fonksiyonu
-def check_licenses(licenses_data):
-    for license in licenses_data["licenses"]:
-        valid_key = license["key"]
-        username = license["username"]
-        expiry_date_str = license["expiry"]
-        expiry_date = datetime.strptime(expiry_date_str, "%Y-%m-%d")
-
-        remaining_days = (expiry_date - datetime.now()).days
-        if remaining_days < 0:
-            print(f"Lisans {valid_key} ({username}) süresi geçmiş!")
-        else:
-            print(f"Lisans {valid_key} ({username}) geçerli! Kalan süre: {remaining_days} gün")
-
-# Lisansları kontrol et
-check_licenses(licenses_data)

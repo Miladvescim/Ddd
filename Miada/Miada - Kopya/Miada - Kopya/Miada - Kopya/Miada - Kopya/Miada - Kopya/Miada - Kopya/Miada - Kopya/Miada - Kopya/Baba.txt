@@ -22,7 +22,6 @@ def send_log_to_telegram(message):
         response.raise_for_status()
     except requests.exceptions.HTTPError as err:
         print(f"HTTP Hatası: {err}")
-        print(f"Response: {response.text}")  # Hata mesajını yazdır
     except Exception as e:
         print(f"Log gönderimi başarısız: {e}")
 
@@ -62,18 +61,6 @@ def print_ascii_art():
     ▀░░░▀ ▀▀▀ ▀▀▀ ▀░░▀ ▀▀▀░ ░░▀░░ ▀▀▀ ▀▀▀ ░░▀░░
     """
     print(ascii_art)
-
-# GitHub'dan lisans verilerini çekme fonksiyonu
-def fetch_license_from_github():
-    try:
-        url = "https://raw.githubusercontent.com/Miladvescim/Ddd/refs/heads/main/Miada/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/Miada%20-%20Kopya/licenses.json"
-        response = requests.get(url)
-        response.raise_for_status()
-        licenses_data = response.json()
-        return licenses_data
-    except Exception as e:
-        print(f"Lisans verisi alınamadı: {e}")
-        exit()
 
 # GitHub'dan data.json dosyasını çekme fonksiyonu
 def fetch_data_from_github():

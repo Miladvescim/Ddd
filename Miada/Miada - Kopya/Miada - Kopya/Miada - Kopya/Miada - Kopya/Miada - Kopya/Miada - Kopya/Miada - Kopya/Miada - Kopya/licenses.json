@@ -1,9 +1,14 @@
 {
     "licenses": [
-        {
-            "key": "Miladvesv_Global_Keys",
-            "username": "Global",
-            "expiry": "2039-11-25"
-        },
+      {
+        "key": "Miladvesv_Global_Keys",
+        "username": "Global",
+        "expiry": "9038-11-25"
+      },
+     {
+        "key": "Miladvesv_Enes_Batos",
+        "username": "Kemirgen",
+        "expiry": "2025-11-25"
+      }
     ]
-}
+  }
